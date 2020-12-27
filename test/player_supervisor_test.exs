@@ -1,37 +1,51 @@
 defmodule ToyRobot.PlayerSupervisorTest do
   use ExUnit.Case, async: true
 
-  alias ToyRobot.{Game.PlayerSupervisor, Robot}
+  alias ToyRobot.Table
+  alias ToyRobot.{Game.PlayerSupervisor, Game.PlayerRegistry, Robot}
 
-  test "starts a game child process" do
-    robot = %Robot{north: 0, east: 0, facing: :north}
-    {:ok, player} = PlayerSupervisor.start_child(robot, "Izzy")
+  setup do
+    registry_id = "player-sup-test-#{UUID.uuid4()}" |> String.to_atom()
+    Registry.start_link(keys: :unique, name: registry_id)
 
-    [{registered_player, _}] = Registry.lookup(ToyRobot.Game.PlayerRegistry, "Izzy")
+    starting_position = %{north: 0, east: 0, facing: :north}
+    player_name = "Izzy"
 
-    assert registered_player == player
+    {:ok, _player} = PlayerSupervisor.start_child(
+      registry_id,
+      build_table(),
+      starting_position,
+      player_name
+    )
+
+    [{_registered_player, _}] = Registry.lookup(
+      registry_id, player_name
+    )
+
+    {:ok,  %{registry_id: registry_id, player_name: player_name}}
   end
 
-  test "starts a registry" do
-    registry = Process.whereis(ToyRobot.Game.PlayerRegistry)
-    assert registry
-  end
 
-  test "moves a robot forward" do
-    robot = %Robot{north: 0, east: 0, facing: :north}
-    {:ok, _player} = PlayerSupervisor.start_child(robot, "Charlie")
-    :ok = PlayerSupervisor.move("Charlie")
+  test "moves a robot forward", %{registry_id: registry_id, player_name: player_name} do
 
-    %{north: north} = PlayerSupervisor.report("Charlie")
+    :ok = PlayerSupervisor.move(registry_id, player_name)
+
+    %{north: north} = PlayerSupervisor.report(registry_id, player_name)
 
     assert north == 1
   end
 
-  test "reports a robot's location" do
-    robot = %Robot{north: 0, east: 0, facing: :north}
-    {:ok, _player} = PlayerSupervisor.start_child(robot, "Davros")
-    %{north: north} = PlayerSupervisor.report("Davros")
+  test "reports a robot's location", %{registry_id: registry_id, player_name: player_name} do
+
+    %{north: north} = PlayerSupervisor.report(registry_id, player_name)
 
     assert north == 0
+  end
+
+  def build_table do
+    %Table{
+      north_boundary: 4,
+      east_boundary: 4
+    }
   end
 end

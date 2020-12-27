@@ -9,8 +9,8 @@ defmodule ToyRobot.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       escript: escript(),
-      #Docs
-      name: "ToyRobot",
+      # Docs
+      name: "ToyRobot"
     ]
   end
 
@@ -25,11 +25,11 @@ defmodule ToyRobot.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
+      {:uuid, "~> 1.1"}
     ]
   end
 
   defp escript do
-  [main_module: ToyRobot.CLI]
+    [main_module: ToyRobot.CLI]
   end
 end
