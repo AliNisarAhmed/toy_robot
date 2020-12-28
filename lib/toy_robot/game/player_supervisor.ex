@@ -3,14 +3,6 @@ defmodule ToyRobot.Game.PlayerSupervisor do
 
   alias ToyRobot.Game.Player
 
-  def move(registry_id, name) do
-    registry_id |> Player.process_name(name) |> Player.move()
-  end
-
-  def report(registry_id, name) do
-    registry_id |> Player.process_name(name) |> Player.report()
-  end
-
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
   end

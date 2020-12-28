@@ -133,4 +133,21 @@ defmodule ToyRobot.Simulation do
 
   def report(%Simulation{robot: robot}), do: robot
 
+  @doc """
+  Shows where the robot would move next
+
+  ## Examples
+
+    iex> alias ToyRobot.{Robot, Table, Simulation}
+    [ToyRobot.Robot, ToyRobot.Table, ToyRobot.Simulation]
+    iex> table = %Table{north_boundary: 5, east_boundary: 5}
+    %Table{north_boundary: 5, east_boundary: 5}
+    iex> simulation = %Simulation{table: table, robot: %Robot{north: 0, east: 0, faacing: :north}}
+    iex> simulation |> Simulation.next_position
+    %Robot{north: 1, easta: 0, facing: :north}
+  """
+  def next_position(%{robot: robot} = _simulation) do
+    robot |> Robot.move
+  end
+
 end
